@@ -1376,8 +1376,12 @@ function App() {
       {/* Mobile Menu Toggle - Outside Sidebar */}
       <button 
         className="mobile-menu-toggle" 
-        onClick={() => setSidebarOpen(!sidebarOpen)}
+        onClick={() => {
+          console.log('Hamburger clicked, current state:', sidebarOpen);
+          setSidebarOpen(!sidebarOpen);
+        }}
         aria-label="Toggle menu"
+        style={{ display: 'flex' }}
       >
         <Menu size={24} />
       </button>
