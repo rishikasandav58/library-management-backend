@@ -1373,34 +1373,13 @@ function App() {
 
   return (
     <div className="app">
-      {/* Mobile Menu Toggle - Outside Sidebar */}
-      <button 
-        className="mobile-menu-toggle" 
-        onClick={() => {
-          console.log('Hamburger clicked, current state:', sidebarOpen);
-          setSidebarOpen(!sidebarOpen);
-        }}
-        aria-label="Toggle menu"
-        style={{ display: 'flex' }}
-      >
-        <Menu size={24} />
-      </button>
-
-      {/* Overlay for mobile */}
-      {sidebarOpen && (
-        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
-      )}
-
-      {/* Sidebar */}
-      <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
+      {/* Sidebar - Desktop Only */}
+      <aside className="sidebar desktop-only">
         <div className="sidebar-header">
           <div className="logo">
             <Library size={28} className="logo-icon" />
             <span className="logo-text">LibraTech</span>
           </div>
-          <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu size={20} />
-          </button>
         </div>
 
         <nav className="sidebar-nav">
@@ -1450,6 +1429,20 @@ function App() {
           {activeTab === "reports" && <ReportsSection stats={stats} onToast={addToast} />}
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="mobile-nav">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            className={`mobile-nav-item ${activeTab === tab.id ? "active" : ""}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.icon}
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </nav>
 
       {/* Toasts */}
       <div className="toast-container">
