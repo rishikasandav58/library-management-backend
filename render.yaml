@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: library-management-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: PORT
+        value: 10000
+    plan: free
