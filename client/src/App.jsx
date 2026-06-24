@@ -1322,7 +1322,7 @@ function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [stats, setStats] = useState(() => loadFromStorage(STORAGE_KEYS.stats) || {});
   const [toasts, setToasts] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
 
   const addToast = (message, type = "info") => {
     const id = Date.now();
