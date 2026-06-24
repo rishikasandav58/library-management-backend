@@ -1324,6 +1324,19 @@ function App() {
   const [toasts, setToasts] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
 
+  // Handle resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const addToast = (message, type = "info") => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type }]);
