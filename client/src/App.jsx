@@ -426,49 +426,49 @@ function BooksSection({ onToast }) {
           <p>Try adjusting your filters or add a new book</p>
         </div>
       ) : (
-        <div className="book-grid">
+        <div className="books-grid">
           {books.map((book, i) => (
             <div key={book._id} className="book-card animate-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
-              <div className="book-card-header">
-                <div>
-                  <h4 className="book-card-title" title={book.title}>{book.title}</h4>
-                  <p className="book-card-author">{book.author}</p>
+              <div className="book-cover-wrapper">
+                <img src={getCoverImage(book)} alt={book.title} className="book-cover" />
+                <div className="book-cover-overlay">
+                  <button className="overlay-btn" onClick={() => { setEditingBook(book); setShowForm(true); }} title="Edit">
+                    <Edit3 size={16} />
+                  </button>
+                  <button className="overlay-btn overlay-btn-danger" onClick={() => setDeleteConfirm(book)} title="Delete">
+                    <Trash2 size={16} />
+                  </button>
                 </div>
-                <span className={`status-badge ${book.status === 'available' ? 'available' : book.status === 'issued' ? 'issued' : 'overdue'}`}>
-                  {book.status}
-                </span>
+                <span className={`book-status status-${book.status}`}>{book.status}</span>
               </div>
-              
-              <div className="book-card-meta">
-                <span>{book.genre || "General"}</span>
-                {book.publishYear && <span>{book.publishYear}</span>}
-                <span>⭐ {book.rating || 0}</span>
-              </div>
-              
-              <div className="book-card-footer">
+              <div className="book-info">
+                <h4 className="book-title" title={book.title}>{book.title}</h4>
+                <p className="book-author">{book.author}</p>
+                <div className="book-meta">
+                  <span className="book-genre">{book.genre || "General"}</span>
+                  {book.publishYear && <span className="book-year">{book.publishYear}</span>}
+                </div>
+                <div className="book-rating">
+                  {[1,2,3,4,5].map(s => (
+                    <Star key={s} size={14} className={s <= Math.round(book.rating) ? "star-filled" : "star-empty"} />
+                  ))}
+                  <span>{book.rating || 0}</span>
+                </div>
                 {book.status === "available" ? (
-                  <button className="btn btn-primary" onClick={() => setIssuingBook(book)}>
+                  <button className="btn-action btn-issue" onClick={() => setIssuingBook(book)}>
                     <LogOut size={14} /> Issue
                   </button>
                 ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <User size={14} className="text-muted" />
-                    <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{book.issuedTo}</span>
+                  <div className="issued-info">
+                    <p><User size={12} /> {book.issuedTo}</p>
+                    {book.dueDate && (
+                      <p><Clock size={12} /> Due: {new Date(book.dueDate).toLocaleDateString()}</p>
+                    )}
+                    <button className="btn-action btn-return" onClick={() => handleReturn(book._id)}>
+                      <Check size={14} /> Return
+                    </button>
                   </div>
                 )}
-                <div className="book-card-actions">
-                  <button className="book-card-btn" onClick={() => { setEditingBook(book); setShowForm(true); }} title="Edit">
-                    <Edit3 size={16} />
-                  </button>
-                  <button className="book-card-btn" onClick={() => setDeleteConfirm(book)} title="Delete" style={{ color: 'var(--danger)' }}>
-                    <Trash2 size={16} />
-                  </button>
-                  {book.status !== "available" && (
-                    <button className="book-card-btn" onClick={() => handleReturn(book._id)} title="Return" style={{ color: 'var(--success)' }}>
-                      <Check size={16} />
-                    </button>
-                  )}
-                </div>
               </div>
             </div>
           ))}
@@ -1322,20 +1322,7 @@ function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [stats, setStats] = useState(() => loadFromStorage(STORAGE_KEYS.stats) || {});
   const [toasts, setToasts] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
-
-  // Handle resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) {
-        setSidebarOpen(true);
-      } else {
-        setSidebarOpen(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const addToast = (message, type = "info") => {
     const id = Date.now();
@@ -1373,13 +1360,16 @@ function App() {
 
   return (
     <div className="app">
-      {/* Sidebar - Desktop Only */}
-      <aside className="sidebar desktop-only">
+      {/* Sidebar */}
+      <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
           <div className="logo">
             <Library size={28} className="logo-icon" />
             <span className="logo-text">LibraTech</span>
           </div>
+          <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            <Menu size={20} />
+          </button>
         </div>
 
         <nav className="sidebar-nav">
@@ -1429,20 +1419,6 @@ function App() {
           {activeTab === "reports" && <ReportsSection stats={stats} onToast={addToast} />}
         </div>
       </main>
-
-      {/* Mobile Bottom Navigation */}
-      <nav className="mobile-nav">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            className={`mobile-nav-item ${activeTab === tab.id ? "active" : ""}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.icon}
-            <span>{tab.label}</span>
-          </button>
-        ))}
-      </nav>
 
       {/* Toasts */}
       <div className="toast-container">
